@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 
 public class CubeController : MonoBehaviour {
@@ -28,7 +28,7 @@ public class CubeController : MonoBehaviour {
 		zAxisObject = GameObject.FindGameObjectWithTag("greenY");
 
 		r = GetComponent<Rigidbody>();
-		//r.AddRelativeTorque(new Vector3(0.1f, 0, 0f));
+		r.AddRelativeTorque(new Vector3(-3f, -2.2f, -2f));
 		startTime = Time.time;
 	}
 	int count = 0;
@@ -36,7 +36,9 @@ public class CubeController : MonoBehaviour {
 	bool currentDerivative;
 
 	Vector3 theta, lastTheta, deltaTheta;
-
+	Vector3 lastPos;
+	int check = 0;
+	float yPrev, zPrev;
 	// Update is called once per frame
 	void FixedUpdate () {
 		if(Time.time > startTime + 2 && !begin) {
@@ -45,7 +47,38 @@ public class CubeController : MonoBehaviour {
 		}
 		if(!begin) return;
 
+		Vector3 pos = r.transform.InverseTransformDirection(earthMagneticField);
+		float y = ((pos.y - lastPos.y)/Time.deltaTime);
+		float z = ((pos.z - lastPos.z)/Time.deltaTime);
+		//print("y: " + y);
+		//print("z: " + z);
 
+		if(check == 0) {
+			if((y>=0 && yPrev<=0) || (y<=0 && yPrev>=0)) {
+				if(z > 0) {
+					check = 1;
+				}
+			}
+		}
+		else if(check == 1) {
+			if((z>=0 && zPrev<=0) || (z<=0 && zPrev>=0)) {
+				if(y > 0) print("Counter Clockwise!");
+				else print("Clockwise!");
+				check = 0;
+			}
+		}
+
+
+
+		yPrev = y;
+		zPrev = z;
+		//print("(" + pos.x + ", " + pos.y + ", " + pos.z + ")");
+
+		lastPos = pos;
+
+		// Below is the method that zeros out a component and measures the angular displacement.
+
+		/*
 		Vector3 pos = r.transform.InverseTransformDirection(earthMagneticField);
 
 		Vector3 baseX = yAxisObject.transform.position;
@@ -70,6 +103,7 @@ public class CubeController : MonoBehaviour {
 
 		lastTheta = theta;
 
+		*/
 
 		
 
